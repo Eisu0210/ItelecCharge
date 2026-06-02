@@ -81,7 +81,25 @@ async function main(): Promise<void> {
   const BASE = `http://127.0.0.1:${staticServer.port}`;
 
   try {
-    const browser = await playwright.chromium.launch({ headless: true });
+    let browser: Awaited<ReturnType<typeof playwright.chromium.launch>> | null = null;
+    try {
+      browser = await playwright.chromium.launch({ headless: true });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      const missingBrowser =
+        message.includes("Executable doesn't exist") ||
+        message.includes("playwright install") ||
+        message.includes("chrome-headless-shell");
+
+      if (missingBrowser) {
+        console.warn("Playwright Chromium absent sur cet environnement — pré-rendu ignoré.");
+        console.warn("Installez-le avec: pnpm exec playwright install chromium");
+        return;
+      }
+
+      throw error;
+    }
+
     const page = await browser.newPage();
 
     for (const route of PRERENDER_PATHS) {
