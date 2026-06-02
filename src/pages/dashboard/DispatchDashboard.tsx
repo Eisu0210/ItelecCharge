@@ -3,7 +3,14 @@ import { Link } from "react-router-dom";
 import { useData } from "../../context/DataContext";
 import type { Lead } from "../../types";
 
-export function DispatchDashboard() {
+export function DispatchDashboard({
+  showTimelineLink = true,
+  embedded = false,
+}: {
+  showTimelineLink?: boolean;
+  /** Intégré dans la page Planning (titres secondaires, pas de lien timeline). */
+  embedded?: boolean;
+} = {}) {
   const { data, patchLead } = useData();
   const [toast, setToast] = useState("");
 
@@ -53,10 +60,16 @@ export function DispatchDashboard() {
     <div>
       {toast ? <div className="toast">{toast}</div> : null}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
-        <h1 style={{ marginTop: 0 }}>Dispatch</h1>
-        <Link to="/app/timeline" className="btn btn-primary">
-          Vue timeline techniciens
-        </Link>
+        {embedded ? (
+          <h2 style={{ marginTop: 0, color: "var(--color-navy)" }}>Pool à affecter</h2>
+        ) : (
+          <h1 style={{ marginTop: 0 }}>Dispatch</h1>
+        )}
+        {showTimelineLink ? (
+          <Link to="/app/planning#timeline-planning" className="btn btn-primary">
+            Vue timeline techniciens
+          </Link>
+        ) : null}
       </div>
       <p style={{ color: "var(--color-muted)" }}>
         Dossiers avec devis accepté et signé, en attente d’affectation. Ajustez le créneau horaire selon la

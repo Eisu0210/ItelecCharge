@@ -1,34 +1,60 @@
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
+import { SeoHead } from "../components/SeoHead";
+import { connexionDemoHint } from "../data/demoAccounts";
 import { useAuth } from "../context/AuthContext";
+import { buildPageTitle } from "../lib/seo";
 
 export function ConnexionPage() {
-  const { user, login } = useAuth();
+  const { user, login, ready } = useAuth();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  if (!ready) {
+    return (
+      <div className="container" style={{ padding: "3rem 0" }}>
+        <p>Vérification de la session…</p>
+      </div>
+    );
+  }
   if (user) return <Navigate to="/app" replace />;
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    if (login(username, password)) {
-      navigate("/app", { replace: true });
-    } else {
-      setError("Identifiants invalides. Comptes démo : admin, commercial, installateur, dispatch — mot de passe ItelecCharge.");
+    try {
+      if (await login(username, password)) {
+        navigate("/app", { replace: true });
+        return;
+      }
+      setError(`Identifiants invalides. ${connexionDemoHint()} Après un seed, relancez « npm run db:seed » si besoin.`);
+    } catch (err) {
+      const msg = err instanceof Error && err.message === "server" ? "server" : "network";
+      setError(
+        msg === "server"
+          ? "Erreur serveur à la connexion. Relancez « npm run dev » (l’API sur le port 3001 doit être démarrée)."
+          : "Impossible de joindre l’API (port 3001). Relancez « npm run dev » et vérifiez que le terminal affiche « API ItelecCharge — http://localhost:3001 »."
+      );
     }
   }
 
   return (
-    <div className="container" style={{ padding: "3rem 0", maxWidth: 440 }}>
+    <>
+      <SeoHead
+        title={buildPageTitle("Connexion espace pro")}
+        description="Accès réservé aux équipes ITELEC CHARGE."
+        path="/connexion"
+        noindex
+      />
+      <div className="connexion-page-wrap">
+      <div className="container connexion-page-inner">
       <div className="card">
         <h1 style={{ marginTop: 0 }}>Connexion espace pro</h1>
         <p style={{ color: "var(--color-muted)", fontSize: "0.9rem" }}>
-          Comptes de démonstration (sans vérification) :{" "}
-          <strong>admin</strong>, <strong>commercial</strong>, <strong>installateur</strong>,{" "}
-          <strong>dispatch</strong> — mot de passe <code>ItelecCharge</code>.
+          {connexionDemoHint()} Les comptes sont créés / mis à jour par <code>npm run db:seed</code> (mot de passe
+          haché en base).
         </p>
         <form onSubmit={onSubmit}>
           <div className="field">
@@ -62,6 +88,8 @@ export function ConnexionPage() {
           </button>
         </form>
       </div>
+      </div>
     </div>
+    </>
   );
 }

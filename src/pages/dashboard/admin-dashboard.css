@@ -1,0 +1,168 @@
+/* Vue globale admin — sections repliables */
+
+.admin-dashboard-section {
+  overflow: hidden;
+}
+
+.admin-dashboard-section__bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.7rem 0.75rem 0.7rem 0.65rem;
+}
+
+.admin-dashboard-section__toggle {
+  flex-shrink: 0;
+  width: 2.1rem;
+  height: 2.1rem;
+  margin-top: 0.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: rgba(0, 51, 88, 0.05);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: inherit;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.admin-dashboard-section__toggle:hover {
+  background: rgba(0, 104, 55, 0.08);
+  border-color: rgba(0, 104, 55, 0.35);
+}
+
+.admin-dashboard-section__toggle:focus-visible {
+  outline: 2px solid var(--color-green);
+  outline-offset: 2px;
+}
+
+.admin-dashboard-section__chevron {
+  display: block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid var(--color-navy);
+  border-bottom: 2px solid var(--color-navy);
+  transform: rotate(-45deg);
+  margin-left: -0.12rem;
+  transition: transform 0.15s ease;
+}
+
+.admin-dashboard-section--open .admin-dashboard-section__chevron {
+  transform: rotate(45deg);
+  margin-top: -0.08rem;
+  margin-left: 0;
+}
+
+.admin-dashboard-section__meta-btn {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.admin-dashboard-section__meta-btn:focus-visible {
+  outline: 2px solid var(--color-green);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.admin-dashboard-section__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-navy);
+  line-height: 1.25;
+}
+
+.admin-dashboard-section__desc {
+  margin: 0.2rem 0 0;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: var(--color-muted);
+  max-width: 52ch;
+}
+
+.admin-dashboard-section__count {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-green);
+}
+
+.admin-dashboard-section__actions {
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 0.05rem;
+}
+
+.admin-dashboard-section__body {
+  border-top: 1px solid var(--color-border);
+}
+
+.admin-dashboard-section__body > .table-wrap {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  margin-bottom: 0 !important;
+}
+
+.admin-dashboard-section__empty {
+  margin: 0;
+  padding: 0.85rem 1rem 1rem;
+  color: var(--color-muted);
+  font-size: 0.88rem;
+}
+
+.admin-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+}
+
+.admin-section-cta {
+  font-size: 0.82rem;
+  padding: 0.4rem 0.75rem;
+  min-height: 36px;
+}
+
+@media (max-width: 900px) {
+  .admin-dashboard-section__bar {
+    flex-wrap: wrap;
+    padding: 0.55rem 0.5rem 0.55rem 0.45rem;
+  }
+
+  .admin-dashboard-section__title {
+    font-size: 0.95rem;
+  }
+
+  .admin-dashboard-section__desc {
+    font-size: 0.78rem;
+  }
+
+  .admin-dashboard-section__actions {
+    width: 100%;
+    margin-left: 2.6rem;
+  }
+
+  .admin-dashboard-section__actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .admin-section-head .admin-section-cta {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+}

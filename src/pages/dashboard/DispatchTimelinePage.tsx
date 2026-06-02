@@ -15,7 +15,7 @@ const colors = {
   upcoming: "#ffffff",
 };
 
-export function DispatchTimelinePage() {
+export function DispatchTimelinePage({ planningContext = false }: { planningContext?: boolean }) {
   const { data } = useData();
 
   const byTech = useMemo(() => {
@@ -34,16 +34,37 @@ export function DispatchTimelinePage() {
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
-        <h1 style={{ marginTop: 0 }}>Vue timeline</h1>
-        <Link to="/app" className="btn btn-ghost">
-          Retour dispatch
-        </Link>
+      <div
+        className="u-stack-toolbar"
+        style={{ justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}
+      >
+        {planningContext ? (
+          <h2 style={{ marginTop: 0, color: "var(--color-navy)" }}>Vue timeline techniciens</h2>
+        ) : (
+          <h1 style={{ marginTop: 0 }}>Vue timeline</h1>
+        )}
+        {planningContext ? (
+          <a href="#pool-dispatch" className="btn btn-ghost">
+            Pool à affecter
+          </a>
+        ) : (
+          <Link to="/app/planning#pool-dispatch" className="btn btn-ghost">
+            Pool dispatch
+          </Link>
+        )}
       </div>
       <p style={{ color: "var(--color-muted)" }}>
         Légende : <span style={{ color: colors.done }}>■</span> clôturé ·{" "}
         <span style={{ color: colors.active }}>■</span> en cours ·{" "}
-        <span style={{ border: "1px solid #ccc", display: "inline-block", width: 10, height: 10 }} /> à
+        <span
+          style={{
+            border: "1px solid var(--color-border)",
+            display: "inline-block",
+            width: 10,
+            height: 10,
+          }}
+        />{" "}
+        à
         venir
       </p>
 
@@ -60,21 +81,14 @@ export function DispatchTimelinePage() {
             {list.length === 0 ? (
               <p style={{ color: "var(--color-muted)" }}>Aucune installation planifiée.</p>
             ) : (
-              <div
-                style={{
-                  display: "flex",
-                  gap: "0.5rem",
-                  overflowX: "auto",
-                  paddingBottom: "0.35rem",
-                }}
-              >
+              <div className="dispatch-timeline-track">
                 {list.map((l) => {
                   const b = bucket(l);
                   return (
                     <div
                       key={l.id}
+                      className="dispatch-timeline-card"
                       style={{
-                        minWidth: 200,
                         borderRadius: 10,
                         border: b === "upcoming" ? "1px solid var(--color-border)" : "none",
                         background: colors[b],

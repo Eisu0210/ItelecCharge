@@ -1,0 +1,179 @@
+/* Page Clients — liste fine sur mobile */
+
+@media (max-width: 900px) {
+  .clients-page > h1 {
+    font-size: 1.1rem !important;
+    margin-bottom: 0.2rem !important;
+  }
+
+  .clients-page > p:first-of-type {
+    font-size: 0.78rem;
+    margin: 0 0 0.55rem;
+    line-height: 1.4;
+  }
+
+  .clients-page__create {
+    margin-bottom: 0.5rem !important;
+    padding: 0.5rem 0.6rem !important;
+  }
+
+  .clients-page__create h2 {
+    font-size: 0.9rem !important;
+  }
+
+  .clients-list-table .section-search-bar {
+    padding: 0.32rem 0.45rem !important;
+  }
+
+  .clients-list-table .section-search-bar .input {
+    padding: 0.38rem 0.5rem;
+    font-size: 0.84rem;
+  }
+
+  .clients-list-table tbody tr {
+    margin-bottom: 0.28rem;
+    padding: 0.4rem 0.48rem 0.45rem;
+    border-radius: 6px;
+    box-shadow: none;
+    border-left-width: 2px;
+  }
+
+  .clients-list-table td.table-cell-primary {
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    font-size: 0.84rem !important;
+  }
+
+  .clients-list-table .table-cell-primary-head {
+    gap: 0.35rem;
+    align-items: center;
+  }
+
+  .clients-list-table .table-cell-primary-head strong {
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.2;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .clients-list-table .table-cell-primary-badge {
+    font-size: 0.62rem !important;
+    padding: 0.08rem 0.32rem !important;
+    max-width: 46%;
+    line-height: 1.2;
+    border-radius: 3px;
+  }
+
+  .clients-list-table .clients-list-address {
+    font-size: 0.7rem !important;
+    margin-top: 0.12rem !important;
+    line-height: 1.3;
+    color: var(--color-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .clients-list-table .clients-list-mobile-meta {
+    display: block;
+    margin-top: 0.14rem;
+    font-size: 0.68rem;
+    line-height: 1.35;
+    color: var(--color-muted);
+  }
+
+  .clients-list-table .clients-list-mobile-meta span + span::before {
+    content: " · ";
+  }
+
+  .clients-list-table tbody tr td.clients-list-desktop-only {
+    display: none !important;
+  }
+
+  .clients-list-card-footer--mobile {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.28rem 0.35rem;
+    margin-top: 0.38rem;
+    padding-top: 0.32rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .clients-list-card-footer--mobile .clients-list-status {
+    flex: 1 1 7.5rem;
+    min-width: 0;
+  }
+
+  .clients-list-card-footer--mobile .clients-list-status select {
+    width: 100%;
+    padding: 0.22rem 0.38rem;
+    font-size: 0.72rem;
+    min-height: 30px;
+    border-radius: 5px;
+  }
+
+  .clients-list-card-footer--mobile .clients-list-status .badge {
+    font-size: 0.68rem;
+    padding: 0.12rem 0.35rem;
+  }
+
+  .clients-list-card-footer--mobile .clients-list-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.2rem 0.28rem;
+    margin-left: auto;
+  }
+
+  .clients-list-card-footer--mobile .clients-list-link {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.2rem 0.45rem;
+    min-height: 28px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .clients-list-card-footer--mobile .clients-list-link--primary {
+    background: var(--color-green);
+    color: #fff;
+  }
+
+  .clients-list-card-footer--mobile .clients-list-link--primary:hover,
+  .clients-list-card-footer--mobile .clients-list-link--primary:focus-visible {
+    color: #fff;
+    filter: brightness(1.06);
+  }
+
+  .clients-list-card-footer--mobile .clients-list-link--ghost {
+    color: var(--color-navy);
+    background: rgba(0, 51, 88, 0.06);
+    border: 1px solid var(--color-border);
+  }
+
+  .clients-list-card-footer--mobile .clients-list-link--danger {
+    color: #b42318;
+    background: rgba(180, 35, 24, 0.06);
+    border: 1px solid rgba(180, 35, 24, 0.2);
+  }
+
+  .clients-list-card-footer--mobile button.clients-list-link {
+    cursor: pointer;
+    font-family: inherit;
+  }
+}
+
+@media (min-width: 901px) {
+  .clients-list-mobile-meta,
+  .clients-list-card-footer--mobile {
+    display: none !important;
+  }
+}

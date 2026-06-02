@@ -60,7 +60,7 @@ export function SignaturePad({
   }
 
   return (
-    <div>
+    <div className="signature-pad-wrap">
       <canvas
         ref={ref}
         width={440}

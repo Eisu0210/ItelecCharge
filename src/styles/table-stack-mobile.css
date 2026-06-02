@@ -1,0 +1,238 @@
+/**
+ * Tableaux denses → cartes empilées (≤900px, aligné menu admin mobile).
+ * Utiliser : table-wrap--stack-mobile + data-label sur chaque <td> (sauf cellule principale).
+ */
+@media (max-width: 900px) {
+  .table-wrap--stack-mobile {
+    overflow-x: visible;
+  }
+
+  .table-wrap--stack-mobile table {
+    min-width: 0 !important;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .table-wrap--stack-mobile thead {
+    display: none;
+  }
+
+  .table-wrap--stack-mobile tbody {
+    display: block;
+  }
+
+  .table-wrap--stack-mobile tbody tr {
+    display: block;
+    margin-bottom: 0.75rem;
+    padding: 0.85rem 1rem;
+    background: var(--surface, #fff);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0, 51, 88, 0.06);
+  }
+
+  .table-wrap--stack-mobile tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .table-wrap--stack-mobile tbody tr.clients-row-done {
+    background: #e7f8ee;
+    border-color: rgba(0, 104, 55, 0.22);
+  }
+
+  .table-wrap--stack-mobile tbody tr.clients-row-active {
+    background: #fff4e9;
+    border-color: rgba(230, 126, 34, 0.25);
+  }
+
+  .table-wrap--stack-mobile tbody tr:nth-child(even) td,
+  .table-wrap--stack-mobile tbody tr:hover td {
+    background: transparent !important;
+  }
+
+  .table-wrap--stack-mobile td {
+    display: grid;
+    grid-template-columns: minmax(6.75rem, 36%) 1fr;
+    gap: 0.25rem 0.65rem;
+    align-items: start;
+    padding: 0.5rem 0 !important;
+    border: none !important;
+    font-size: 0.875rem !important;
+    text-align: left !important;
+    vertical-align: top;
+    word-break: break-word;
+  }
+
+  .table-wrap--stack-mobile td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-muted);
+    line-height: 1.35;
+    padding-top: 0.1rem;
+  }
+
+  .table-wrap--stack-mobile td.table-cell-primary {
+    display: block;
+    grid-template-columns: unset;
+    padding-bottom: 0.6rem !important;
+    margin-bottom: 0.35rem;
+    border-bottom: 1px solid var(--color-border) !important;
+    font-size: 0.95rem !important;
+  }
+
+  .table-wrap--stack-mobile td.table-cell-primary::before {
+    display: none;
+  }
+
+  .table-wrap--stack-mobile td.table-empty-row {
+    display: block;
+    text-align: center;
+    padding: 1.1rem 0.5rem !important;
+    color: var(--color-muted);
+  }
+
+  .table-wrap--stack-mobile td.table-empty-row::before {
+    display: none;
+  }
+
+  .table-wrap--stack-mobile td:not([data-label])::before {
+    display: none;
+  }
+
+  .table-wrap--stack-mobile td:not([data-label]):not(.table-cell-primary):not(.table-empty-row) {
+    grid-template-columns: 1fr;
+  }
+
+  .table-wrap--stack-mobile td[data-label="Actions"],
+  .table-wrap--stack-mobile td[data-label="Planification"],
+  .table-wrap--stack-mobile td[data-label="Dossier"] {
+    grid-template-columns: 1fr;
+    padding-top: 0.55rem !important;
+    margin-top: 0.25rem;
+    border-top: 1px dashed var(--color-border) !important;
+  }
+
+  .table-wrap--stack-mobile td[data-label="Actions"] .btn,
+  .table-wrap--stack-mobile td[data-label="Planification"] .btn,
+  .table-wrap--stack-mobile td[data-label="Dossier"] .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .table-wrap--stack-mobile td .input,
+  .table-wrap--stack-mobile td select {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .table-wrap--stack-mobile td input[type="datetime-local"] {
+    max-width: 100%;
+  }
+
+  .table-wrap--stack-mobile td label {
+    white-space: normal;
+  }
+
+  /* Variante compacte (liste clients, dossiers admin…) */
+  .table-wrap--stack-compact tbody tr {
+    margin-bottom: 0.4rem;
+    padding: 0.5rem 0.65rem;
+    border-radius: 8px;
+    box-shadow: none;
+  }
+
+  .table-wrap--stack-compact td {
+    padding: 0.22rem 0 !important;
+    font-size: 0.8125rem !important;
+    grid-template-columns: minmax(5.25rem, 30%) 1fr;
+    gap: 0.15rem 0.45rem;
+  }
+
+  .table-wrap--stack-compact td::before {
+    font-size: 0.65rem;
+    letter-spacing: 0.02em;
+  }
+
+  .table-wrap--stack-compact td.table-cell-primary {
+    padding-bottom: 0.4rem !important;
+    margin-bottom: 0.2rem;
+    font-size: 0.875rem !important;
+  }
+
+  .table-wrap--stack-compact .table-cell-primary-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.45rem;
+  }
+
+  .table-cell-primary-badge {
+    display: none;
+  }
+
+  .table-wrap--stack-compact .table-cell-primary-badge {
+    display: inline-block;
+    flex-shrink: 0;
+    font-size: 0.65rem;
+    line-height: 1.25;
+    max-width: 44%;
+    text-align: right;
+    padding: 0.12rem 0.4rem;
+  }
+
+  .table-wrap--stack-compact td[data-label="Étape"] {
+    display: none !important;
+  }
+
+  .table-wrap--stack-compact td[data-label="Statut"] select + span {
+    display: none;
+  }
+
+  .table-wrap--stack-compact td[data-label="Statut"] .input,
+  .table-wrap--stack-compact td[data-label="Statut"] select {
+    padding: 0.3rem 0.45rem;
+    font-size: 0.78rem;
+    min-height: 0;
+  }
+
+  .table-wrap--stack-compact td[data-label="Actions"],
+  .table-wrap--stack-compact td[data-label="Dossier"] {
+    padding-top: 0.35rem !important;
+    margin-top: 0.1rem;
+    border-top: 1px solid var(--color-border) !important;
+  }
+
+  .table-wrap--stack-compact td[data-label="Actions"] > div,
+  .table-wrap--stack-compact td[data-label="Dossier"] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+  }
+
+  .table-wrap--stack-compact td[data-label="Actions"] .btn,
+  .table-wrap--stack-compact td[data-label="Dossier"] .btn {
+    width: auto;
+    min-height: 34px;
+    padding: 0.32rem 0.65rem;
+    font-size: 0.78rem;
+  }
+
+  .table-wrap--stack-compact td[data-label="Commission payée"],
+  .table-wrap--stack-compact td[data-label="Payé par le client"] {
+    display: inline-block;
+    width: calc(50% - 0.2rem);
+    vertical-align: top;
+    box-sizing: border-box;
+    padding-right: 0.35rem !important;
+  }
+
+  .table-wrap--stack-compact td[data-label="Payé par le client"] {
+    padding-left: 0.35rem !important;
+    padding-right: 0 !important;
+  }
+}

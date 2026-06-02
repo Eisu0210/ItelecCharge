@@ -1,0 +1,238 @@
+/* Pied de page vitrine — DA Itelec (marine / vert / fond clair, pas de bleu tiers) */
+
+.site-footer {
+  margin-top: 3rem;
+  font-size: 0.95rem;
+}
+
+.site-footer a {
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+/* Corps : fond clair comme le reste du site */
+.site-footer-body {
+  background: linear-gradient(180deg, rgba(0, 51, 88, 0.04) 0%, var(--bg) 42%);
+  border-top: 1px solid var(--color-border);
+  padding: clamp(2.25rem, 5vw, 3rem) 0 clamp(2rem, 4vw, 2.75rem);
+}
+
+.site-footer-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding-bottom: clamp(1.75rem, 3vw, 2.25rem);
+  margin-bottom: clamp(1.75rem, 3vw, 2.25rem);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.site-footer-logo-link {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.site-footer-logo-link:hover {
+  text-decoration: none;
+  opacity: 0.9;
+}
+
+.site-footer-logo {
+  height: 44px;
+  width: auto;
+  max-width: min(220px, 48vw);
+  object-fit: contain;
+}
+
+.site-footer-lead {
+  margin: 0;
+  max-width: 42ch;
+  color: var(--color-muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.site-footer-lead strong {
+  color: var(--color-navy);
+  font-weight: 700;
+}
+
+.site-footer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+.site-footer-col-title {
+  margin: 0 0 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-navy);
+}
+
+.site-footer-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.site-footer-links a {
+  color: var(--color-navy);
+  font-size: 0.92rem;
+}
+
+.site-footer-links a:hover {
+  color: var(--color-green);
+}
+
+.site-footer-about p {
+  margin: 0 0 0.75rem;
+  color: var(--color-muted);
+  line-height: 1.55;
+  font-size: 0.92rem;
+}
+
+.site-footer-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 10px;
+  background: var(--color-yellow);
+  color: var(--color-navy);
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.site-footer-cta:hover {
+  filter: brightness(1.05);
+  text-decoration: none;
+}
+
+/* Barre basse : dégradé hero */
+.site-footer-bar {
+  background: linear-gradient(135deg, #003358 0%, #004a6e 48%, #006837 100%);
+  color: #fff;
+  padding: 1.25rem 0 1.5rem;
+  font-size: 0.85rem;
+}
+
+.site-footer-bar a {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.site-footer-bar a:hover {
+  color: var(--color-yellow);
+}
+
+.site-footer-bar-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.25rem 2rem;
+  flex-wrap: wrap;
+}
+
+.site-footer-legal-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.65rem;
+}
+
+.site-footer-legal-sep {
+  color: rgba(255, 255, 255, 0.4);
+  user-select: none;
+}
+
+.site-footer-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+  text-align: right;
+}
+
+.site-footer-contact-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem 0.85rem;
+}
+
+.site-footer-contact-line a {
+  font-weight: 600;
+}
+
+.site-footer-address {
+  margin: 0;
+  font-style: normal;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.82rem;
+}
+
+.site-footer-address span {
+  display: block;
+}
+
+.site-footer-copy {
+  margin: 0.85rem 0 0;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+@media (max-width: 900px) {
+  .site-footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .site-footer-about {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-footer-intro {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .site-footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .site-footer-bar-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .site-footer-meta {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .site-footer-contact-line {
+    justify-content: flex-start;
+  }
+
+  .site-footer-bar {
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
+  }
+}

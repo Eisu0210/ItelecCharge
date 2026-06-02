@@ -10,7 +10,14 @@ export function RequireAuth({
   children: ReactNode;
   roles?: Role[];
 }) {
-  const { user } = useAuth();
+  const { user, ready } = useAuth();
+  if (!ready) {
+    return (
+      <div className="container" style={{ padding: "2rem" }}>
+        <p>Chargement de la session…</p>
+      </div>
+    );
+  }
   if (!user) return <Navigate to="/connexion" replace />;
   if (roles && !roles.includes(user.role)) {
     return <Navigate to="/app" replace />;

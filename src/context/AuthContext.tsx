@@ -2,71 +2,111 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
+import { apiFetch, getToken, setToken } from "../lib/api";
 import type { Role } from "../types";
 
-const DEMO_PASSWORD = "ItelecCharge";
-
 export interface AuthUser {
+  id: number;
   username: string;
   role: Role;
+  /** Fiche technicien (`installateurs.id`), présent si rôle installateur. */
+  installerId: string | null;
 }
 
 interface AuthContextValue {
   user: AuthUser | null;
-  login: (username: string, password: string) => boolean;
+  /** true une fois la session (token) vérifiée côté API */
+  ready: boolean;
+  login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-function roleFromUsername(u: string): Role | null {
-  const n = u.trim().toLowerCase();
-  if (n === "admin") return "admin";
-  if (n === "commercial") return "commercial";
-  if (n === "installateur") return "installateur";
-  if (n === "dispatch") return "dispatch";
-  return null;
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(() => {
-    try {
-      const raw = localStorage.getItem("itelec_charge_session");
-      if (!raw) return null;
-      const p = JSON.parse(raw) as AuthUser;
-      if (p?.username && p?.role) return p;
-    } catch {
-      /* ignore */
-    }
-    return null;
-  });
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [ready, setReady] = useState(false);
 
-  const login = useCallback((username: string, password: string) => {
-    const role = roleFromUsername(username);
-    if (!role || password !== DEMO_PASSWORD) return false;
-    const next: AuthUser = { username: username.trim(), role };
-    setUser(next);
-    localStorage.setItem("itelec_charge_session", JSON.stringify(next));
+  useEffect(() => {
+    (async () => {
+      const t = getToken();
+      if (!t) {
+        setReady(true);
+        return;
+      }
+      try {
+        const u = await apiFetch<{ id: number; username: string; role: Role; installerId?: string | null }>(
+          "/api/auth/me"
+        );
+        setUser({
+          id: u.id,
+          username: u.username,
+          role: u.role,
+          installerId: u.installerId ?? (u.role === "installateur" ? `tech-u${u.id}` : null),
+        });
+      } catch {
+        setToken(null);
+        setUser(null);
+        localStorage.removeItem("itelec_charge_session");
+      } finally {
+        setReady(true);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    function onUnauthorized() {
+      setUser(null);
+    }
+    window.addEventListener("itelec:unauthorized", onUnauthorized);
+    return () => window.removeEventListener("itelec:unauthorized", onUnauthorized);
+  }, []);
+
+  const login = useCallback(async (username: string, password: string) => {
+    const base = import.meta.env.VITE_API_BASE ?? "";
+    let res: Response;
+    try {
+      res = await fetch(`${base}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+    } catch {
+      throw new Error("network");
+    }
+    if (!res.ok) {
+      if (res.status >= 500) throw new Error("server");
+      return false;
+    }
+    const r = (await res.json()) as { token: string; user: AuthUser };
+    setToken(r.token);
+    const u = r.user;
+    setUser({
+      ...u,
+      installerId:
+        u.installerId ?? (u.role === "installateur" ? `tech-u${u.id}` : null),
+    });
+    localStorage.removeItem("itelec_charge_session");
     return true;
   }, []);
 
   const logout = useCallback(() => {
     setUser(null);
+    setToken(null);
     localStorage.removeItem("itelec_charge_session");
   }, []);
 
   const value = useMemo(
-    () => ({ user, login, logout }),
-    [user, login, logout]
+    () => ({ user, ready, login, logout }),
+    [user, ready, login, logout]
   );
 
-  return (
-    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth(): AuthContextValue {

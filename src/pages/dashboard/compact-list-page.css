@@ -1,0 +1,159 @@
+/* Listes admin compactes (flotte, techniciens…) — mobile ≤900px */
+
+@media (max-width: 900px) {
+  .compact-list-page > p:first-of-type {
+    margin: 0 0 0.35rem;
+    font-size: 0.82rem;
+  }
+
+  .compact-list-page > h1 {
+    font-size: 1.1rem !important;
+    margin: 0 0 0.25rem !important;
+  }
+
+  .compact-list-page > h1 + p {
+    font-size: 0.78rem;
+    margin: 0 0 0.65rem;
+    line-height: 1.4;
+  }
+
+  .compact-list-page__create {
+    margin-bottom: 0.65rem !important;
+    padding: 0.55rem 0.65rem !important;
+  }
+
+  .compact-list-page__create h2 {
+    font-size: 0.9rem !important;
+  }
+
+  .compact-list-page__create .btn {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.78rem;
+    min-height: 36px;
+  }
+
+  .compact-list-page__create .field {
+    margin-bottom: 0.65rem;
+  }
+
+  .compact-list-page__create label {
+    font-size: 0.72rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .compact-list-page__create .input,
+  .compact-list-page__create select {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .compact-list-table tbody tr {
+    margin-bottom: 0.35rem;
+    padding: 0.45rem 0.55rem;
+    border-left-width: 2px;
+    border-left-color: var(--color-green);
+  }
+
+  .compact-list-table td.table-cell-primary {
+    padding-bottom: 0.3rem !important;
+    margin-bottom: 0.15rem;
+    font-size: 0.84rem !important;
+  }
+
+  .compact-list-table .compact-list-id {
+    display: none;
+  }
+
+  .compact-list-table .compact-list-meta {
+    font-size: 0.72rem !important;
+    margin-top: 0.1rem !important;
+    line-height: 1.35;
+    color: var(--color-muted);
+  }
+
+  .compact-list-table .compact-list-meta a {
+    color: var(--color-green);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .compact-list-badge {
+    flex-shrink: 0;
+    font-size: 0.65rem;
+    line-height: 1.25;
+    max-width: 50%;
+    text-align: right;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 0.1rem 0.35rem;
+    white-space: nowrap;
+  }
+
+  .compact-plate-badge {
+    font-family: ui-monospace, monospace;
+    letter-spacing: 0.04em;
+    background: rgba(0, 104, 55, 0.1);
+    color: var(--color-green);
+  }
+
+  .compact-stat-badge {
+    background: rgba(0, 51, 88, 0.08);
+    color: var(--color-navy);
+  }
+
+  .compact-list-table tr:has(.compact-plate-badge) td[data-label="Plaque"] {
+    display: none !important;
+  }
+
+  .compact-list-table tr:has(.compact-stat-badge) td[data-label="Dossiers assignés"],
+  .compact-list-table tr:has(.compact-stat-badge) td[data-label="Clôturés"] {
+    display: none !important;
+  }
+
+  .compact-list-table tr:has(.compact-vehicle-meta) td[data-label="Camionnette"],
+  .compact-list-table tr:has(.compact-vehicle-meta) td[data-label="Coordonnées"],
+  .compact-list-table tr:has(.compact-contact-meta) td[data-label="Coordonnées"] {
+    display: none !important;
+  }
+
+  .compact-list-table td[data-label="Technicien"] select {
+    padding: 0.28rem 0.4rem;
+    font-size: 0.78rem;
+    min-height: 34px;
+  }
+
+  .compact-list-table td[data-label="Actions"] {
+    padding-top: 0.28rem !important;
+    margin-top: 0.05rem;
+    border-top: 1px dashed var(--color-border) !important;
+  }
+
+  .compact-list-table td[data-label="Actions"] > div {
+    gap: 0.25rem;
+  }
+
+  .compact-list-table .compact-list-btn-sm {
+    padding: 0.28rem 0.5rem;
+    font-size: 0.72rem;
+    min-height: 32px;
+  }
+
+  .compact-list-table .section-search-bar {
+    padding: 0.35rem 0.5rem !important;
+  }
+
+  /* Utilisateurs : meta date + id déjà dans la cellule principale */
+  .compact-list-table .users-page__date-line {
+    display: block;
+  }
+
+  .admin-survey-preview tr:has(.admin-survey-badge) td[data-label="Statut"],
+  .admin-survey-preview tr:has(.admin-survey-badge) td[data-label="Commercial"] {
+    display: none !important;
+  }
+}
+
+.admin-survey-badge {
+  background: rgba(253, 238, 0, 0.45);
+  color: #4a3d00;
+}

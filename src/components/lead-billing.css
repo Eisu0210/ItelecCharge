@@ -1,0 +1,88 @@
+.lead-billing__lede {
+  font-size: 0.88rem;
+  color: var(--color-muted);
+  line-height: 1.45;
+  margin: 0 0 0.75rem;
+  max-width: 62ch;
+}
+
+.lead-billing__model-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.lead-billing__warn {
+  color: #b42318;
+  font-size: 0.88rem;
+}
+
+.lead-billing__status-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.lead-billing__status {
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.lead-billing__status--active {
+  color: var(--color-green);
+}
+
+.lead-billing__status--past_due {
+  color: #c0392b;
+}
+
+.lead-billing__hint {
+  font-size: 0.78rem;
+  color: var(--color-muted);
+  margin: 0.35rem 0 0;
+  line-height: 1.4;
+}
+
+.lead-billing__commission-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+}
+
+@media (max-width: 520px) {
+  .lead-billing__commission-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lead-billing__history ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.82rem;
+}
+
+.lead-billing__history li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.lead-billing__pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: rgba(0, 51, 88, 0.08);
+}
+
+.lead-billing__pill--paid {
+  background: rgba(0, 104, 55, 0.12);
+  color: var(--color-green);
+}

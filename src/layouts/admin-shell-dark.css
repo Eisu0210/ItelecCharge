@@ -1,0 +1,396 @@
+/**
+ * Thème sombre — uniquement sous .admin-shell--dark (espace pro).
+ * Palette à contraste élevé (WCAG AA visé sur texte courant).
+ */
+
+.admin-shell--dark {
+  color-scheme: dark;
+  --bg: #161c24;
+  --surface: #222c38;
+  --text: #f4f7fb;
+  --color-muted: #c2ccd9;
+  --color-border: #445568;
+  --color-navy: #f0f4f8;
+  --color-green: #6ee7a8;
+  --color-yellow: #ffe566;
+  --color-orange: #ffb366;
+  --shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+  --pro-navy-soft: rgba(255, 255, 255, 0.08);
+  --pro-yellow-soft: rgba(253, 238, 0, 0.14);
+  --pro-accent-soft: rgba(110, 231, 168, 0.16);
+}
+
+.admin-shell--dark,
+.admin-shell--dark .app-page {
+  color: var(--text);
+}
+
+/* ——— Sidebar & navigation ——— */
+.admin-shell--dark .admin-shell-sidebar {
+  background: linear-gradient(180deg, #1e2833 0%, #1a222c 100%);
+  border-right-color: var(--color-border);
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.35);
+}
+
+.admin-shell--dark .admin-shell-brand span {
+  color: var(--text);
+}
+
+.admin-shell--dark .admin-shell-nav-link {
+  color: #c8d4e0;
+}
+
+.admin-shell--dark .admin-shell-nav-link svg {
+  opacity: 1;
+  color: #a8b8c8;
+}
+
+.admin-shell--dark .admin-shell-nav-link:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(110, 231, 168, 0.25);
+}
+
+.admin-shell--dark .admin-shell-nav-link:hover svg {
+  color: var(--color-green);
+}
+
+.admin-shell--dark .admin-shell-nav-link.admin-shell-nav-active {
+  color: var(--text);
+  background: rgba(110, 231, 168, 0.14);
+  border-color: rgba(110, 231, 168, 0.35);
+}
+
+.admin-shell--dark .admin-shell-nav-link.admin-shell-nav-active svg {
+  color: var(--color-green);
+}
+
+.admin-shell--dark .admin-shell-footer {
+  background: linear-gradient(180deg, transparent 0%, #1a222c 35%);
+  box-shadow: 0 -6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.admin-shell--dark .admin-shell-user-meta strong {
+  color: var(--text);
+}
+
+.admin-shell--dark .admin-shell-user-meta span {
+  color: var(--color-green);
+}
+
+.admin-shell--dark .admin-shell-footer .admin-shell-site {
+  color: var(--color-muted);
+}
+
+.admin-shell--dark .admin-shell-footer .admin-shell-site:hover {
+  color: var(--text);
+}
+
+.admin-shell--dark .admin-shell-logout {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--color-border);
+}
+
+.admin-shell--dark .admin-shell-logout:hover {
+  background: rgba(192, 57, 43, 0.2);
+  color: #ffc9c2;
+  border-color: rgba(255, 150, 130, 0.4);
+}
+
+.admin-shell--dark .admin-shell-theme-toggle {
+  color: var(--text);
+  border-color: var(--color-border);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.admin-shell--dark .admin-shell-theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--color-green);
+}
+
+/* ——— Zone principale ——— */
+.admin-shell--dark .admin-shell-main {
+  background: var(--bg);
+}
+
+.admin-shell--dark .admin-shell .btn-ghost {
+  color: var(--text);
+  border-color: var(--color-border);
+}
+
+.admin-shell--dark .admin-shell .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  border-color: #5a6d82;
+}
+
+.admin-shell--dark .admin-shell th {
+  background: #2a3544;
+  color: var(--color-muted);
+}
+
+.admin-shell--dark .admin-shell td {
+  color: var(--text);
+}
+
+.admin-shell--dark .admin-shell tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.admin-shell--dark .admin-shell .input,
+.admin-shell--dark .admin-shell select,
+.admin-shell--dark .admin-shell textarea {
+  background: #2a3544;
+  color: var(--text);
+  border-color: var(--color-border);
+}
+
+.admin-shell--dark .admin-shell .input::placeholder,
+.admin-shell--dark .admin-shell textarea::placeholder {
+  color: #8a9aad;
+  opacity: 1;
+}
+
+.admin-shell--dark .admin-shell-main a:not(.btn):not(.admin-shell-nav-link):not(.admin-shell-site):not(.clients-list-link) {
+  color: var(--color-green);
+}
+
+.admin-shell--dark .admin-shell-main a:not(.btn):not(.admin-shell-nav-link):not(.admin-shell-site):not(.clients-list-link):hover {
+  color: #a8f5c8;
+}
+
+.admin-shell--dark .admin-shell .badge {
+  background: #354656;
+  color: #e2e8f0;
+}
+
+.admin-shell--dark .admin-shell .badge-green {
+  background: rgba(110, 231, 168, 0.22);
+  color: #b8f5d4;
+}
+
+.admin-shell--dark .admin-shell .badge-yellow {
+  background: rgba(255, 229, 102, 0.25);
+  color: #fff4b8;
+}
+
+.admin-shell--dark .admin-shell .badge-orange {
+  background: rgba(255, 179, 102, 0.22);
+  color: #ffd9b0;
+}
+
+.admin-shell--dark .admin-shell .clients-row-done td {
+  background: rgba(110, 231, 168, 0.1);
+}
+
+.admin-shell--dark .admin-shell .clients-row-active td {
+  background: rgba(255, 179, 102, 0.1);
+}
+
+.admin-shell--dark .admin-shell-menu-btn {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--color-border);
+}
+
+.admin-shell--dark .admin-shell-menu-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #5a6d82;
+}
+
+/* ——— Titres & contenu app-page ——— */
+.admin-shell--dark .app-page > div > h1:first-of-type,
+.admin-shell--dark .app-page > div > h2,
+.admin-shell--dark .app-page .card h1,
+.admin-shell--dark .app-page .card h2,
+.admin-shell--dark .app-page .card h3 {
+  color: var(--text);
+}
+
+.admin-shell--dark .app-page > div > h1:first-of-type + p,
+.admin-shell--dark .app-page > div > h2 + p,
+.admin-shell--dark .app-page label {
+  color: var(--color-muted);
+}
+
+.admin-shell--dark .app-page > div > div[style*="grid"] > .card p {
+  color: var(--text) !important;
+}
+
+.admin-shell--dark .app-page .table-wrap.card thead th {
+  background: #2a3544;
+  color: var(--color-muted);
+}
+
+.admin-shell--dark .app-page .table-wrap.card td {
+  color: var(--text);
+  border-bottom-color: var(--color-border);
+}
+
+.admin-shell--dark .app-page .table-wrap.card tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-shell--dark .app-page .table-wrap.card tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.admin-shell--dark .app-page .table-wrap.card strong {
+  color: var(--text);
+}
+
+.admin-shell--dark .app-page .input,
+.admin-shell--dark .app-page select,
+.admin-shell--dark .app-page textarea {
+  background: #2a3544;
+  color: var(--text);
+  border-color: var(--color-border);
+}
+
+.admin-shell--dark .app-page .input:hover,
+.admin-shell--dark .app-page select:hover,
+.admin-shell--dark .app-page textarea:hover {
+  border-color: #6a7d92;
+}
+
+.admin-shell--dark .app-page .input::placeholder,
+.admin-shell--dark .app-page textarea::placeholder {
+  color: #8a9aad;
+  opacity: 1;
+}
+
+.admin-shell--dark .section-search-input {
+  background: #2a3544;
+  color: var(--text);
+  border-color: var(--color-border);
+}
+
+.admin-shell--dark .section-search-input::placeholder {
+  color: #8a9aad;
+}
+
+/* ——— Tableaux empilés mobile ——— */
+.admin-shell--dark .table-wrap--stack-mobile tbody tr {
+  background: var(--surface);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.admin-shell--dark .table-wrap--stack-mobile tbody tr.clients-row-done {
+  background: rgba(110, 231, 168, 0.12);
+  border-color: rgba(110, 231, 168, 0.35);
+}
+
+.admin-shell--dark .table-wrap--stack-mobile tbody tr.clients-row-active {
+  background: rgba(255, 179, 102, 0.12);
+  border-color: rgba(255, 179, 102, 0.35);
+}
+
+.admin-shell--dark .table-wrap--stack-mobile td {
+  color: var(--text);
+}
+
+.admin-shell--dark .table-wrap--stack-mobile td::before {
+  color: var(--color-muted);
+}
+
+/* ——— Pages dashboard ——— */
+.admin-shell--dark .planning-grid-header {
+  background: linear-gradient(180deg, rgba(110, 231, 168, 0.12) 0%, var(--surface) 100%);
+}
+
+.admin-shell--dark .planning-hint,
+.admin-shell--dark .planning-tech-meta,
+.admin-shell--dark .planning-hour-cell {
+  color: var(--color-muted);
+}
+
+.admin-shell--dark .planning-tech-name,
+.admin-shell--dark .planning-pool-card strong {
+  color: var(--text);
+}
+
+.admin-shell--dark .planning-pool-card,
+.admin-shell--dark .planning-event {
+  background: var(--surface);
+  border-color: var(--color-border);
+  color: var(--text);
+}
+
+.admin-shell--dark .planning-event span,
+.admin-shell--dark .planning-pool-card span {
+  color: var(--color-muted);
+}
+
+.admin-shell--dark .planning-event.is-active {
+  background: rgba(255, 179, 102, 0.18);
+  border-color: rgba(255, 179, 102, 0.45);
+}
+
+.admin-shell--dark .planning-pool-status {
+  color: var(--color-green);
+}
+
+.admin-shell--dark .roi-kpi {
+  background: var(--surface);
+  border-color: var(--color-border);
+}
+
+.admin-shell--dark .roi-kpi-value {
+  color: var(--text);
+}
+
+.admin-shell--dark .admin-dashboard-section__toggle {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--color-border);
+  color: var(--text);
+}
+
+.admin-shell--dark .admin-dashboard-section__toggle:hover {
+  background: rgba(110, 231, 168, 0.15);
+  border-color: var(--color-green);
+}
+
+.admin-shell--dark .admin-dashboard-section__title {
+  color: var(--text);
+}
+
+.admin-shell--dark .admin-dashboard-section__desc,
+.admin-shell--dark .admin-dashboard-section__count,
+.admin-shell--dark .admin-dashboard-section__empty {
+  color: var(--color-muted);
+}
+
+.admin-shell--dark .lead-billing__lede,
+.admin-shell--dark .lead-billing__hint {
+  color: var(--color-muted);
+}
+
+.admin-shell--dark .lead-billing__model {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: var(--text);
+}
+
+.admin-shell--dark .compact-list-table .compact-list-meta {
+  color: var(--color-muted);
+}
+
+.admin-shell--dark .compact-list-table .compact-list-id {
+  color: var(--text);
+}
+
+@media (max-width: 900px) {
+  html:has(.admin-shell--dark),
+  html:has(.admin-shell--dark) body {
+    background: var(--bg);
+  }
+
+  .admin-shell--dark .admin-shell-sidebar {
+    box-shadow: 8px 0 28px rgba(0, 0, 0, 0.45);
+  }
+
+  .admin-shell--dark .admin-shell-mobile-bar {
+    background: var(--surface);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  }
+}
