@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { formatApiErrorMessage } from "../lib/api";
+import { publicApiErrorMessage } from "../lib/safeUserMessage";
 
 type FormState = {
   name: string;
@@ -69,11 +69,10 @@ export function DevisContactForm() {
       }
       setStatus("error");
       setErrorText(
-        data.error ??
-          formatApiErrorMessage(
-            new Error(JSON.stringify(data)),
-            "Envoi impossible. Réessayez plus tard ou contactez-nous par e-mail.",
-          ),
+        publicApiErrorMessage(
+          data as { error?: string },
+          "Envoi impossible. Réessayez plus tard ou contactez-nous par e-mail."
+        )
       );
     } catch {
       setStatus("error");

@@ -157,7 +157,7 @@ export function LeadBillingSection({ lead, canManage, setToast }: Props) {
         <p style={{ color: "var(--color-muted)", fontSize: "0.88rem" }}>Chargement…</p>
       ) : !summary?.configured ? (
         <p className="lead-billing__warn" role="alert">
-          Stripe non configuré sur le serveur (<code>STRIPE_SECRET_KEY</code>).
+          Paiement en ligne temporairement indisponible.
         </p>
       ) : (
         <>

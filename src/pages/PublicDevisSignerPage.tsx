@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { SeoHead } from "../components/SeoHead";
 import { apiFetchPath } from "../lib/apiBase";
+import { publicApiErrorMessage } from "../lib/safeUserMessage";
 import { buildPageTitle } from "../lib/seo";
 
 type SupplementLine = { label: string; amountHtva: number };
@@ -94,7 +95,7 @@ export function PublicDevisSignerPage() {
         const r = await fetch(apiFetchPath(`/api/public/quote-offer/${encodeURIComponent(token)}`));
         if (!r.ok) {
           const j = (await r.json().catch(() => ({}))) as { error?: string };
-          setErr(j.error ?? "Devis introuvable ou lien expiré.");
+          setErr(publicApiErrorMessage(j, "Devis introuvable ou lien expiré."));
           return;
         }
         const data = (await r.json()) as Offer;
@@ -128,10 +129,8 @@ export function PublicDevisSignerPage() {
         }),
       });
       if (!r.ok) {
-        const j = (await r.json().catch(() => ({}))) as { error?: string; details?: string };
-        setErr(
-          j.details ? `${j.error ?? "Erreur"} — ${j.details}` : (j.error ?? "Acceptation impossible.")
-        );
+        const j = (await r.json().catch(() => ({}))) as { error?: string };
+        setErr(publicApiErrorMessage(j, "Acceptation impossible. Réessayez ou contactez-nous."));
         setBusy(false);
         return;
       }

@@ -11,24 +11,7 @@ export function setToken(token: string | null): void {
   else localStorage.removeItem(TOKEN_KEY);
 }
 
-/** Raccourci JSON typique `{ "error", "details?" }` après un fetch non OK. */
-export function formatApiErrorMessage(e: unknown, fallback: string): string {
-  if (!(e instanceof Error)) return fallback;
-  const m = e.message.trim();
-  if (!m.startsWith("{")) {
-    if (m.length < 2 || m === "401" || m === "403" || m === "404" || m === "500") return fallback;
-    return m;
-  }
-  try {
-    const o = JSON.parse(m) as { error?: string; details?: string };
-    if (typeof o.error === "string" && o.error) {
-      return o.details ? `${o.error} — ${o.details}` : o.error;
-    }
-  } catch {
-    /* */
-  }
-  return fallback;
-}
+export { formatApiErrorMessage } from "./safeUserMessage";
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const headers = new Headers(init?.headers);

@@ -11,12 +11,14 @@ if (!url) {
   process.exit(1);
 }
 
-try {
-  const u = new URL(url);
-  if (u.password) u.password = "•••";
-  console.log("[DB] URL (masquée) :", u.toString());
-} catch {
-  console.log("[DB] Connexion configurée.");
+if (process.env.NODE_ENV !== "production") {
+  try {
+    const u = new URL(url);
+    if (u.password) u.password = "•••";
+    console.log("[DB] URL (masquée) :", u.toString());
+  } catch {
+    console.log("[DB] Connexion configurée.");
+  }
 }
 
 export const pool = new Pool({

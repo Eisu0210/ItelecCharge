@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { SeoHead } from "../components/SeoHead";
-import { connexionDemoHint } from "../data/demoAccounts";
 import { useAuth } from "../context/AuthContext";
 import { buildPageTitle } from "../lib/seo";
 
@@ -29,13 +28,15 @@ export function ConnexionPage() {
         navigate("/app", { replace: true });
         return;
       }
-      setError(`Identifiants invalides. ${connexionDemoHint()} Après un seed, relancez « npm run db:seed » si besoin.`);
+      setError("Identifiants incorrects.");
     } catch (err) {
       const msg = err instanceof Error && err.message === "server" ? "server" : "network";
       setError(
-        msg === "server"
-          ? "Erreur serveur à la connexion. Relancez « npm run dev » (l’API sur le port 3001 doit être démarrée)."
-          : "Impossible de joindre l’API (port 3001). Relancez « npm run dev » et vérifiez que le terminal affiche « API ItelecCharge — http://localhost:3001 »."
+        import.meta.env.DEV
+          ? msg === "server"
+            ? "Erreur serveur à la connexion. Vérifiez que l’API est démarrée (pnpm run dev)."
+            : "Impossible de joindre l’API. Vérifiez que l’API est démarrée (pnpm run dev)."
+          : "Connexion temporairement indisponible. Réessayez plus tard."
       );
     }
   }
@@ -53,8 +54,7 @@ export function ConnexionPage() {
       <div className="card">
         <h1 style={{ marginTop: 0 }}>Connexion espace pro</h1>
         <p style={{ color: "var(--color-muted)", fontSize: "0.9rem" }}>
-          {connexionDemoHint()} Les comptes sont créés / mis à jour par <code>npm run db:seed</code> (mot de passe
-          haché en base).
+          Accès réservé aux comptes autorisés. En cas de difficulté, contactez votre administrateur.
         </p>
         <form onSubmit={onSubmit}>
           <div className="field">

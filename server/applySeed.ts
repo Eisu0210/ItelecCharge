@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { pool } from "./db/pool";
-import { DEMO_USER_ROWS, DEMO_PASSWORD } from "../src/data/demoAccounts";
+import { assertDemoSeedAllowed, DEMO_PASSWORD, DEMO_USER_ROWS } from "./demoSeed";
 import { buildSeedLeads, SEED_INSTALLERS } from "./initialData";
 import { leadToInsertRow } from "./leadMap";
 
@@ -8,6 +8,7 @@ import { leadToInsertRow } from "./leadMap";
 const REMOVED_DEMO_LOGINS = ["sitesurvey", "site-survey"] as const;
 
 export async function applySeed(): Promise<void> {
+  assertDemoSeedAllowed();
   const hash = await bcrypt.hash(DEMO_PASSWORD, 10);
   const c = await pool.connect();
   try {

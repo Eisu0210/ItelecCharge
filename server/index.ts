@@ -13,6 +13,10 @@ import {
   rowToLead,
 } from "./leadMap";
 import { isPgUndefinedColumn, sendServerError } from "./apiError";
+import { assertLeadAccess, leadsSqlFilter, restrictLeadPatch } from "./authz";
+import { buildCorsOptions } from "./corsConfig";
+import { checkRateLimit } from "./rateLimit";
+import { isAllowedRexelUrl } from "./rexelUrl";
 import { buildInitialPassword, isValidRole, pickUniqueLogin } from "./userCreate";
 import {
   checkDevisRequestRateLimit,
@@ -64,14 +68,22 @@ import { handleStripeWebhook } from "./stripeWebhook";
 import { logStripeBillingSetup } from "./stripeProducts";
 import type { FleetVehicle, Lead, MaterialCatalogItem, ProjectSpecs, Role } from "../src/types";
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const isProduction = process.env.NODE_ENV === "production";
+const JWT_SECRET = process.env.JWT_SECRET?.trim();
+if (isProduction && !JWT_SECRET) {
+  console.error("JWT_SECRET obligatoire en production.");
+  process.exit(1);
+}
 if (!JWT_SECRET) {
-  console.warn("JWT_SECRET non défini — utilisation d’un secret de dev (à changer en production).");
+  console.warn("JWT_SECRET non défini — secret de dev uniquement (ne pas utiliser en production).");
 }
 const secret = JWT_SECRET || "dev-insecure-jwt-secret-change-in-production";
 
 const app = express();
-app.use(cors({ origin: true, credentials: true }));
+if (isProduction) {
+  app.set("trust proxy", 1);
+}
+app.use(cors(buildCorsOptions()));
 
 app.post(
   "/api/webhooks/stripe",
@@ -81,7 +93,7 @@ app.post(
   }
 );
 
-app.use(express.json({ limit: "25mb" }));
+app.use(express.json({ limit: process.env.JSON_BODY_LIMIT || "2mb" }));
 
 interface JwtPayload {
   sub: string;
@@ -104,7 +116,7 @@ function requireAuth(req: express.Request, res: express.Response, next: express.
     return;
   }
   try {
-    const p = jwt.verify(t, secret) as JwtPayload;
+    const p = jwt.verify(t, secret, { algorithms: ["HS256"] }) as JwtPayload;
     (req as Authed).auth = p;
     next();
   } catch {
@@ -506,7 +518,7 @@ app.get("/api/health", async (_req, res) => {
 app.get("/api/stripe/config", (_req, res) => {
   const publishableKey = getStripePublishableKey();
   if (!publishableKey) {
-    res.status(503).json({ error: "Stripe non configuré (STRIPE_PUBLISHABLE_KEY ou VITE_STRIPE_PUBLISHABLE_KEY)" });
+    res.status(503).json({ error: "Paiement en ligne temporairement indisponible." });
     return;
   }
   res.json({
@@ -517,6 +529,11 @@ app.get("/api/stripe/config", (_req, res) => {
 
 app.post("/api/auth/login", async (req, res) => {
   try {
+    const rateErr = checkRateLimit(req, "login", 15, 15 * 60 * 1000);
+    if (rateErr) {
+      res.status(429).json({ error: rateErr });
+      return;
+    }
     const { username, password } = req.body as { username?: string; password?: string };
     if (!username || !password) {
       res.status(400).json({ error: "Identifiant et mot de passe requis" });
@@ -667,11 +684,7 @@ app.post("/api/users", requireAuth, requireAdmin, async (req, res) => {
       return;
     }
     if (isPgUndefinedColumn(e)) {
-      res.status(500).json({
-        error: "Création impossible",
-        details:
-          "Colonnes prénom/nom manquantes en base. Exécutez : npm run db:migrate (à la racine du projet).",
-      });
+      res.status(500).json({ error: "Création impossible. Contactez l’administrateur." });
       return;
     }
     sendServerError(res, e, "POST /api/users");
@@ -704,12 +717,12 @@ app.delete("/api/users/:id", requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-app.get("/api/app", requireAuth, async (_req, res) => {
+app.get("/api/app", requireAuth, async (req, res) => {
   try {
+    const auth = (req as Authed).auth;
     await ensureInstallerProfilesForUsers();
-    const [ir, lr, sr] = await Promise.all([
-      q("SELECT id, name, phone, email FROM installers ORDER BY name"),
-      q(`
+    const leadFilter = leadsSqlFilter(auth);
+    const leadsSql = `
         SELECT l.*,
           COALESCE(
             NULLIF(TRIM(BOTH ' ' FROM CONCAT_WS(' ', uid.first_name, uid.last_name)), ''),
@@ -721,8 +734,12 @@ app.get("/api/app", requireAuth, async (_req, res) => {
         FROM leads l
         LEFT JOIN users uid ON uid.id = l.created_by_user_id
         LEFT JOIN users ulog ON LOWER(ulog.login) = LOWER(l.commercial_id)
+        ${leadFilter ? `WHERE ${leadFilter.clause}` : ""}
         ORDER BY l.created_at DESC
-      `),
+      `;
+    const [ir, lr, sr] = await Promise.all([
+      q("SELECT id, name, phone, email FROM installers ORDER BY name"),
+      leadFilter ? q(leadsSql, leadFilter.params) : q(leadsSql),
       q<{ id: number; login: string; first_name: string | null; last_name: string | null }>(
         `SELECT id, login, first_name, last_name
          FROM users
@@ -738,11 +755,13 @@ app.get("/api/app", requireAuth, async (_req, res) => {
       if (code !== "42P01") throw e; // undefined_table -> ancien schéma
     }
     let fleetVehicles: FleetVehicle[] = [];
-    try {
-      fleetVehicles = await listFleetVehicles();
-    } catch (e) {
-      const code = (e as { code?: string })?.code;
-      if (code !== "42P01") throw e;
+    if (auth.role === "admin" || auth.role === "dispatch") {
+      try {
+        fleetVehicles = await listFleetVehicles();
+      } catch (e) {
+        const code = (e as { code?: string })?.code;
+        if (code !== "42P01") throw e;
+      }
     }
     res.json({
       version: 1,
@@ -820,8 +839,8 @@ app.post("/api/material-catalog/import-url", requireAuth, requireAdminOrDispatch
       res.status(400).json({ error: "URL non supportée" });
       return;
     }
-    if (!/rexel/i.test(target.hostname)) {
-      res.status(400).json({ error: "URL Rexel attendue" });
+    if (!isAllowedRexelUrl(target)) {
+      res.status(400).json({ error: "URL Rexel non autorisée" });
       return;
     }
     const response = await fetch(target.toString(), {
@@ -837,7 +856,7 @@ app.post("/api/material-catalog/import-url", requireAuth, requireAdminOrDispatch
     const html = await response.text();
     const parsed = parseRexelProductFromHtml(html, target.toString());
     if (!parsed) {
-      res.status(422).json({ error: "Extraction impossible", details: "Nom/référence introuvables sur cette page." });
+      res.status(422).json({ error: "Extraction impossible depuis cette page." });
       return;
     }
     res.json(parsed);
@@ -847,10 +866,7 @@ app.post("/api/material-catalog/import-url", requireAuth, requireAdminOrDispatch
 });
 
 app.patch("/api/material-catalog/:id", requireAuth, requireAdminOrDispatch, async (req, res) => {
-  res.status(405).json({
-    error: "Modification désactivée",
-    details: "Les articles du catalogue sont verrouillés après création pour éviter les erreurs de manipulation.",
-  });
+  res.status(405).json({ error: "Modification désactivée." });
 });
 
 app.delete("/api/material-catalog/:id", requireAuth, requireAdminOrDispatch, async (req, res) => {
@@ -1099,12 +1115,16 @@ app.post("/api/installer-stock/sync-dossier", requireAuth, async (req, res) => {
 
 app.post("/api/leads", requireAuth, async (req, res) => {
   try {
+    const auth = (req as Authed).auth;
+    if (auth.role === "installateur") {
+      res.status(403).json({ error: "Action non autorisée" });
+      return;
+    }
     const lead = req.body as Lead;
     if (!lead?.id) {
       res.status(400).json({ error: "Dossier invalide" });
       return;
     }
-    const auth = (req as Authed).auth;
     if (auth.role === "commercial") {
       lead.createdByUserId = Number(auth.sub);
       lead.commercialId = auth.un.toLowerCase();
@@ -1120,8 +1140,7 @@ app.post("/api/leads", requireAuth, async (req, res) => {
     );
     res.status(201).json({ ok: true });
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Création impossible" });
+    sendServerError(res, e, "POST /api/leads");
   }
 });
 
@@ -1130,7 +1149,16 @@ app.patch("/api/leads/:id", requireAuth, async (req, res) => {
     const auth = (req as Authed).auth;
     const role = auth.role as Role;
     const { id } = req.params;
-    const patch = normalizeLeadPatch(req.body as Partial<Lead>);
+    if (!(await assertLeadAccess(auth, String(id)))) {
+      res.status(404).json({ error: "Dossier introuvable" });
+      return;
+    }
+    const restricted = restrictLeadPatch(role, normalizeLeadPatch(req.body as Partial<Lead>));
+    if (!restricted) {
+      res.status(403).json({ error: "Action non autorisée" });
+      return;
+    }
+    const patch = restricted;
     if (role === "installateur" && patch.surveyMaterials !== undefined) {
       const userInstallerId = installerProfileIdForUser(Number(auth.sub), auth.un, role);
       if (!userInstallerId) {
@@ -1166,8 +1194,7 @@ app.patch("/api/leads/:id", requireAuth, async (req, res) => {
     await q(`UPDATE leads SET ${setSql} WHERE id = $${n}`, [...values, id]);
     res.json({ ok: true });
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Mise à jour impossible" });
+    sendServerError(res, e, "PATCH /api/leads/:id");
   }
 });
 
@@ -1175,11 +1202,7 @@ app.patch("/api/leads/:id", requireAuth, async (req, res) => {
 app.post("/api/leads/:id/send-quote-email", requireAuth, requireAdminSiteSurveyOrDispatch, async (req, res) => {
   try {
     if (!isSmtpConfigured()) {
-      res.status(503).json({
-        error: "Envoi e-mail non configuré",
-        details:
-          "Définissez SMTP_HOST et MAIL_FROM dans le fichier .env à la racine du projet. Voir les commentaires sous « Envoi e-mails ».",
-      });
+      res.status(503).json({ error: "Envoi e-mail temporairement indisponible." });
       return;
     }
     const id = String(req.params.id ?? "").trim();
@@ -1225,15 +1248,14 @@ app.post("/api/leads/:id/send-quote-email", requireAuth, requireAdminSiteSurveyO
     await q(`UPDATE leads SET ${setSql} WHERE id = $${n}`, [...values, id]);
     res.json({ ok: true, portalUrl });
   } catch (e) {
-    console.error(e);
-    const details = e instanceof Error ? e.message : String(e);
-    res.status(500).json({ error: "L’e-mail n’a pas pu être envoyé", details });
+    sendServerError(res, e, "POST /api/leads/:id/send-quote-email");
   }
 });
 
 app.post("/api/leads/batch-patch", requireAuth, async (req, res) => {
   const c = await pool.connect();
   try {
+    const auth = (req as Authed).auth;
     const { updates } = req.body as {
       updates?: Array<{ id: string; patch: Partial<Lead> }>;
     };
@@ -1249,7 +1271,18 @@ app.post("/api/leads/batch-patch", requireAuth, async (req, res) => {
         res.status(400).json({ error: "id manquant dans updates" });
         return;
       }
-      const { setSql, values } = buildLeadPatchSet(update.patch ?? {});
+      if (!(await assertLeadAccess(auth, String(id)))) {
+        await c.query("ROLLBACK");
+        res.status(404).json({ error: "Dossier introuvable" });
+        return;
+      }
+      const restricted = restrictLeadPatch(auth.role, normalizeLeadPatch(update.patch ?? {}));
+      if (!restricted) {
+        await c.query("ROLLBACK");
+        res.status(403).json({ error: "Action non autorisée" });
+        return;
+      }
+      const { setSql, values } = buildLeadPatchSet(restricted);
       if (!setSql) continue;
       const n = values.length + 1;
       await c.query(`UPDATE leads SET ${setSql} WHERE id = $${n}`, [...values, id]);
@@ -1262,8 +1295,7 @@ app.post("/api/leads/batch-patch", requireAuth, async (req, res) => {
     } catch {
       /* */
     }
-    console.error(e);
-    res.status(500).json({ error: "Mise à jour groupée impossible" });
+    sendServerError(res, e, "POST /api/leads/batch-patch");
   } finally {
     c.release();
   }
@@ -1281,7 +1313,7 @@ app.get("/api/leads/:id/billing", requireAuth, requireAdminOrDispatch, async (re
 app.post("/api/leads/:id/billing/checkout-subscription", requireAuth, requireAdmin, async (req, res) => {
   try {
     if (!isStripeConfigured()) {
-      res.status(503).json({ error: "Stripe non configuré (STRIPE_SECRET_KEY)" });
+      res.status(503).json({ error: "Paiement en ligne temporairement indisponible." });
       return;
     }
     const { url } = await createSubscriptionCheckoutSession(req.params.id);
@@ -1314,7 +1346,7 @@ app.post("/api/leads/:id/billing/commission", requireAuth, requireAdmin, async (
   }
 });
 
-app.delete("/api/leads/:id", requireAuth, async (req, res) => {
+app.delete("/api/leads/:id", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const r = await q("DELETE FROM leads WHERE id = $1", [id]);
@@ -1324,12 +1356,11 @@ app.delete("/api/leads/:id", requireAuth, async (req, res) => {
     }
     res.json({ ok: true });
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Suppression impossible" });
+    sendServerError(res, e, "DELETE /api/leads/:id");
   }
 });
 
-app.post("/api/installers", requireAuth, async (req, res) => {
+app.post("/api/installers", requireAuth, requireAdminOrDispatch, async (req, res) => {
   try {
     const { id, name, phone, email } = req.body as {
       id?: string;
@@ -1344,12 +1375,11 @@ app.post("/api/installers", requireAuth, async (req, res) => {
     await q("INSERT INTO installers (id, name, phone, email) VALUES ($1,$2,$3,$4)", [id, name, phone, email]);
     res.status(201).json({ ok: true });
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Création impossible" });
+    sendServerError(res, e, "POST /api/installers");
   }
 });
 
-app.patch("/api/installers/:id", requireAuth, async (req, res) => {
+app.patch("/api/installers/:id", requireAuth, requireAdminOrDispatch, async (req, res) => {
   try {
     const { id } = req.params;
     const b = req.body as Partial<{ name: string; phone: string; email: string }>;
@@ -1376,12 +1406,11 @@ app.patch("/api/installers/:id", requireAuth, async (req, res) => {
     await q(`UPDATE installers SET ${parts.join(", ")} WHERE id = $${n}`, v);
     res.json({ ok: true });
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Mise à jour impossible" });
+    sendServerError(res, e, "PATCH /api/installers/:id");
   }
 });
 
-app.get("/api/fleet-vehicles", requireAuth, async (_req, res) => {
+app.get("/api/fleet-vehicles", requireAuth, requireAdminOrDispatch, async (_req, res) => {
   try {
     const items = await listFleetVehicles();
     res.json(items);
@@ -1510,7 +1539,7 @@ app.delete("/api/fleet-vehicles/:id", requireAuth, requireAdminOrDispatch, async
   }
 });
 
-app.delete("/api/installers/:id", requireAuth, async (req, res) => {
+app.delete("/api/installers/:id", requireAuth, requireAdminOrDispatch, async (req, res) => {
   const { id } = req.params;
   const c = await pool.connect();
   try {
@@ -1533,8 +1562,7 @@ app.delete("/api/installers/:id", requireAuth, async (req, res) => {
     } catch {
       /* */
     }
-    console.error(e);
-    res.status(500).json({ error: "Suppression impossible" });
+    sendServerError(res, e, "DELETE /api/installers/:id");
   } finally {
     c.release();
   }
@@ -1564,13 +1592,15 @@ app.post("/api/public/devis-request", async (req, res) => {
     const result = await handleDevisRequest(parsed.data);
     res.status(201).json({
       ok: true,
-      leadId: result.leadId,
       message: "Votre demande a bien été envoyée. Nous vous répondons dans les meilleurs délais.",
+      ...(isProduction ? {} : { leadId: result.leadId }),
     });
   } catch (e) {
     const err = e as Error & { code?: string };
     if (err.code === "SMTP_NOT_CONFIGURED") {
-      res.status(503).json({ error: err.message, code: err.code });
+      res.status(503).json({
+        error: "Envoi par e-mail indisponible. Contactez-nous par téléphone ou e-mail.",
+      });
       return;
     }
     sendServerError(res, e, "POST /api/public/devis-request");
@@ -1580,6 +1610,11 @@ app.post("/api/public/devis-request", async (req, res) => {
 /** Page publique d’acceptation électronique du devis — pas d’auth JWT. */
 app.get("/api/public/quote-offer/:token", async (req, res) => {
   try {
+    const rateErr = checkRateLimit(req, "quote-offer", 60, 60 * 60 * 1000);
+    if (rateErr) {
+      res.status(429).json({ error: rateErr });
+      return;
+    }
     const token = String(req.params.token ?? "").trim();
     if (!token) {
       res.status(400).json({ error: "Lien invalide" });
@@ -1641,6 +1676,11 @@ app.get("/api/public/quote-offer/:token", async (req, res) => {
 
 app.post("/api/public/quote-sign/:token", async (req, res) => {
   try {
+    const rateErr = checkRateLimit(req, "quote-sign", 20, 60 * 60 * 1000);
+    if (rateErr) {
+      res.status(429).json({ error: rateErr });
+      return;
+    }
     const token = String(req.params.token ?? "").trim();
     const body = req.body as {
       accept?: boolean;

@@ -82,10 +82,7 @@ export function UsersPage() {
       } catch (e) {
         if (!cancel) {
           setErr(
-            formatApiErrorMessage(
-              e,
-              "Chargement impossible. Vérifiez l’API et la base (DATABASE_URL, migrations)."
-            )
+            formatApiErrorMessage(e, "Chargement impossible. Réessayez ou contactez l’administrateur.")
           );
         }
       } finally {
@@ -122,10 +119,7 @@ export function UsersPage() {
       setRole("installateur");
     } catch (e) {
       setFormErr(
-        formatApiErrorMessage(
-          e,
-          "Création impossible. Vérifiez la base (migration) et la configuration."
-        )
+        formatApiErrorMessage(e, "Création impossible. Réessayez ou contactez l’administrateur.")
       );
     } finally {
       setSaving(false);
@@ -337,7 +331,7 @@ export function UsersPage() {
             {rows.length === 0 ? (
               <p className="users-page__empty">
                 <strong>Aucun utilisateur</strong>
-                Créez un compte ou exécutez le script de base de données (seed) pour les comptes de démonstration.
+                Aucun compte pour le moment. Contactez l’administrateur pour obtenir un accès.
               </p>
             ) : (
               <table className="users-page__table">

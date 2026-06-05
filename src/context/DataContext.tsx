@@ -89,7 +89,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setData({ ...d, fleetVehicles: d.fleetVehicles ?? [] });
     } catch (e) {
       if (!silent) {
-        setError(formatApiErrorMessage(e, "Chargement impossible. Vérifiez l’API et la base (DATABASE_URL, migrations)."));
+        setError(formatApiErrorMessage(e, "Chargement impossible. Réessayez ou contactez l’administrateur."));
         setData(empty);
       }
     } finally {

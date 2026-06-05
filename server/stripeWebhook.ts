@@ -27,9 +27,8 @@ export async function handleStripeWebhook(
   try {
     event = stripe.webhooks.constructEvent(req.body as Buffer, sig, secret);
   } catch (e) {
-    const msg = e instanceof Error ? e.message : "Signature invalide";
-    console.warn("[stripe webhook]", msg);
-    res.status(400).json({ error: msg });
+    console.warn("[stripe webhook] signature invalide");
+    res.status(400).json({ error: "Signature invalide" });
     return;
   }
 

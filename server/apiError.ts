@@ -1,8 +1,5 @@
 import type { Response } from "express";
 
-/** Détails d’exception renvoyés seulement hors production (aide au debug local). */
-const EXPOSE_ERROR_DETAILS = process.env.NODE_ENV !== "production";
-
 export function isPgUndefinedColumn(e: unknown): boolean {
   return (
     typeof e === "object" &&
@@ -12,11 +9,16 @@ export function isPgUndefinedColumn(e: unknown): boolean {
   );
 }
 
+function logError(prefix: string, e: unknown): void {
+  if (e instanceof Error) {
+    console.error(`[${prefix}]`, e.message);
+  } else {
+    console.error(`[${prefix}]`, "erreur inconnue");
+  }
+}
+
+/** Réponse 500 générique — aucun détail technique exposé au client. */
 export function sendServerError(res: Response, e: unknown, logPrefix = "API"): void {
-  console.error(`[${logPrefix}]`, e);
-  const details = EXPOSE_ERROR_DETAILS && e instanceof Error ? e.message : undefined;
-  res.status(500).json({
-    error: "Erreur serveur",
-    ...(details ? { details } : {}),
-  });
+  logError(logPrefix, e);
+  res.status(500).json({ error: "Une erreur est survenue. Réessayez plus tard." });
 }

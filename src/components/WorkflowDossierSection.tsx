@@ -171,20 +171,15 @@ export function WorkflowDossierSection({ lead, patchLead, setToast }: Props) {
     setSendingMail(true);
     try {
       const { portalUrl } = await sendQuoteEmailToClient(lead.id);
-      const onLocal =
-        typeof window !== "undefined" &&
-        (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
-      if (onLocal && portalUrl) {
-        setToast(
-          `Devis envoyé à ${lead.email}. Lien de test (même ordinateur, app ouverte) : ${portalUrl}`
-        );
-        setTimeout(() => setToast(""), 12000);
+      if (import.meta.env.DEV && portalUrl) {
+        setToast(`Devis envoyé à ${lead.email}. Lien de test (dev uniquement) disponible dans le dossier.`);
+        setTimeout(() => setToast(""), 8000);
       } else {
         setToast(`Devis envoyé par e-mail à ${lead.email}.`);
         setTimeout(() => setToast(""), 4000);
       }
     } catch (e) {
-      setToast(formatApiErrorMessage(e, "Envoi impossible. Vérifiez la configuration SMTP dans .env."));
+      setToast(formatApiErrorMessage(e, "Envoi impossible. Réessayez plus tard."));
       setTimeout(() => setToast(""), 6000);
     } finally {
       setSendingMail(false);
